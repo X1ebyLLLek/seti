@@ -146,13 +146,35 @@ def test_find_value_rejects_forged_record(base):
                 forged = dict(n.store._items[key].record)
                 forged["addresses"] = [{"host": "10.6.6.6", "port": 6666}]
                 n.store._items[key].record = forged
-        reader = nodes[5] if nodes[5] is not victim else nodes[4]
+        reader = nodes[5]
+        await victim.stop()                     # владелец недоступен: в сети только подделки
         lk = await reader.get_record(key)
-        await stop_nodes(nodes)
+        await stop_nodes([n for n in nodes if n is not victim])
         return lk
 
     lk = run(go())
     assert not lk.success                       # поддельная запись не принята
+
+
+def test_owner_serves_own_record_and_store_survives_restart(base):
+    async def go():
+        nodes = await start_nodes(base, 6)
+        owner = nodes[3]
+        key = record_key(owner.identity.node_id)
+        rec = await nodes[1].rpc.find_value(owner.self_contact(), key)        # запрос самому владельцу
+        holder = next(n for n in nodes if n.store.get(key, now_ms()))
+        await holder.stop()
+        from overlay.node import Node
+        again = Node(holder.cfg)                                              # перезапуск с тем же каталогом
+        kept = again.store.get(key, now_ms())
+        again.log.close()
+        await stop_nodes([n for n in nodes if n is not holder])
+        return rec, kept, again, holder
+
+    (record, contacts), kept, again, holder = run(go())
+    assert record is not None and record["node_id"] is not None
+    assert again.identity.node_id == holder.identity.node_id
+    assert kept is not None                                                    # реплика пережила перезапуск
 
 
 def test_publish_timestamps_and_lifetime(base):

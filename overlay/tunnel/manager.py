@@ -124,7 +124,7 @@ class OutTunnel:
                 "relays": len(self.relays), "created_ms": self.created_ms, "built_ms": self.built_ms,
                 "build_ms": round(self.build_ms, 2), "acks": self.acks, "misses": self.misses,
                 "failed_node": self.failed_node.hex() if self.failed_node else None,
-                "close_reason": self.close_reason}
+                "close_reason": self.close_reason, "dead_ms": self.dead_ms}
 
 
 @dataclass

@@ -79,6 +79,9 @@ class DhtRpc:
         sender = self._sender(conn, body["sender"])
         key = body["key"]
         rec = self.node.store.get(key, now_ms())
+        own = self.node.own_record
+        if rec is None and own is not None and key == self.node.own_record_key and own["expires_at"] > now_ms():
+            rec = own                                  # владелец — авторитетный источник своей записи
         resp = {"responder": self.node.self_contact().to_wire(), "key": key, "contacts": []}
         if rec is not None:
             resp["record"] = rec

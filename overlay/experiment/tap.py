@@ -39,6 +39,8 @@ class PcapWriter:
 
     def packet(self, src: tuple[str, int], dst: tuple[str, int], seq: int, ack: int, flags: int,
                payload: bytes = b"", ts: float | None = None) -> None:
+        if self.fh.closed:
+            return
         ts = time.time() if ts is None else ts
         sip = bytes(int(x) for x in src[0].split("."))
         dip = bytes(int(x) for x in dst[0].split("."))

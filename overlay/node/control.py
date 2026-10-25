@@ -12,6 +12,7 @@ import asyncio
 import hmac
 import json
 import os
+import random
 import secrets
 
 from ..dht import record_key
@@ -41,6 +42,7 @@ class ControlServer:
             "build_tunnel": self.c_build_tunnel, "close_tunnel": self.c_close_tunnel, "inbox": self.c_inbox,
             "history": self.c_history, "freeze": self.c_freeze, "refresh": self.c_refresh, "join": self.c_join,
             "save": self.c_save, "shutdown": self.c_shutdown, "ping": self.c_ping,
+            "echo_burst": self.c_echo_burst,
         }
 
     async def start(self) -> None:
@@ -153,6 +155,18 @@ class ControlServer:
     async def c_ping(self, host: str, port: int):
         r = await self.node.rpc.ping(host, int(port))
         return {"node_id": r.contact.node_id.hex(), "rtt_ms": r.rtt_ms}
+
+    async def c_echo_burst(self, host: str, port: int, count: int = 100, seed: int = 1, max_size: int = 60000):
+        """Этап 1: обмен count кадрами ECHO переменной длины с другим узлом."""
+        rnd = random.Random(seed)
+        matched, sizes = 0, []
+        for _ in range(int(count)):
+            size = rnd.choice([0, 1, 23, 24, 25, rnd.randint(0, 2000), rnd.randint(0, int(max_size))])
+            data = rnd.randbytes(size)
+            matched += (await self.node.rpc.echo(host, int(port), data)) == data
+            sizes.append(size)
+        return {"sent": len(sizes), "matched": matched, "min_size": min(sizes), "max_size": max(sizes),
+                "total_payload_bytes": sum(sizes)}
 
     async def c_shutdown(self):
         if self.on_shutdown:

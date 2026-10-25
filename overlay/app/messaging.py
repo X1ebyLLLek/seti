@@ -146,7 +146,12 @@ class MessagingService:
     async def _recover(self, dead: OutTunnel) -> None:
         """Автоматическое построение нового маршрута после отказа (исключая отказавший узел)."""
         dest_id = dead.dest.node_id
-        exclude = {dead.failed_node} if dead.failed_node and dead.failed_node != dest_id else set()
+        if dead.failed_node and dead.failed_node != dest_id:
+            exclude = {dead.failed_node}
+        else:
+            # Отказ обнаружен по тайм-ауту подтверждений: виновный неизвестен — исключаем
+            # все ретрансляторы погибшего туннеля.
+            exclude = {c.node_id for c in dead.relays}
         self.log.emit("recovery.start", peer=short(dest_id), dead_tunnel=short(dead.tunnel_id),
                       failed=short(dead.failed_node), reason=dead.close_reason)
         for attempt in range(1, self.cfg.MESSAGE_MAX_ATTEMPTS + 1):

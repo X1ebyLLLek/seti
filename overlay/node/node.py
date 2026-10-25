@@ -69,7 +69,10 @@ class Node:
         self.dispatcher = Dispatcher()
         self.rpc = DhtRpc(self)
         self.routing = RoutingManager(self.table, self.rpc.ping_contact, self.log, cfg.CONTACT_MAX_FAILS)
-        self.store = RecordStore()
+        self.store = RecordStore(os.path.join(cfg.NODE_STATE_DIR, "storage.json"))
+        restored = self.store.load(now_ms(), cfg.MAX_RECORD_BYTES)
+        if restored:
+            self.log.emit("store.restored", records=restored)
         # Провайдер TLS нужен всегда: end-to-end сессия поверх туннеля защищается TLS 1.3
         # и в режиме plain (там без защиты остаются только межузловые соединения).
         self.security = SecurityProvider(self.identity, self.log)
@@ -84,6 +87,9 @@ class Node:
         self.started_ms = now_ms()
         self._seq_path = os.path.join(cfg.NODE_STATE_DIR, "record_seq.json")
         self.own_record: dict | None = None
+        self.publish_acks = 0
+        self._last_publish_try = 0.0
+        self.own_record_key = record_key(self.identity.node_id)
 
     # ================================================================== жизненный цикл
     def self_contact(self) -> Contact:
@@ -210,7 +216,9 @@ class Node:
         rec = make_record(self.identity, [(self.cfg.advertise_host, self.cfg.advertise_port)], self._next_seq(),
                           self.cfg.RECORD_TTL_S, now_ms())
         self.own_record = rec
+        self._last_publish_try = time.monotonic()
         res = await self.put_record(record_key(self.identity.node_id), rec, self.cfg.RECORD_TTL_S)
+        self.publish_acks = len(res.acks)
         self.log.emit("record.publish", seq=rec["sequence_number"], ok=res.ok, acks=len(res.acks),
                       replicas=",".join(a[:8] for a in res.acks))
         return res
@@ -317,6 +325,11 @@ class Node:
                     await self.refresh_buckets()
                 if self.joined and now - last_republish >= self.cfg.REPUBLISH_INTERVAL_S:
                     last_republish = now
+                    await self.publish_self()
+                elif (self.joined and self.publish_acks < self.cfg.REPLICATION_FACTOR
+                      and now - self._last_publish_try >= 5.0 and self.table.size() > 0):
+                    # Запись не размещена на R узлах (например, seed публиковал при пустой
+                    # таблице) — повторяем публикацию, не дожидаясь интервала переопубликования.
                     await self.publish_self()
                 if int(now) % 10 == 0:
                     self.save_state()

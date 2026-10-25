@@ -1,0 +1,90 @@
+{
+ "python": "3.10.11",
+ "msgpack": "1.2.3",
+ "rows": [
+  {
+   "message": "PING",
+   "format": "JSON (+base64)",
+   "bytes": 247,
+   "encode_us": 12.6,
+   "decode_us": 11.61
+  },
+  {
+   "message": "PING",
+   "format": "MessagePack",
+   "bytes": 177,
+   "encode_us": 2.03,
+   "decode_us": 1.45
+  },
+  {
+   "message": "PING",
+   "format": "CBOR (canonical)",
+   "bytes": 177,
+   "encode_us": 13.49,
+   "decode_us": 3.69
+  },
+  {
+   "message": "FIND_NODE_RESPONSE (3 контакта)",
+   "format": "JSON (+base64)",
+   "bytes": 931,
+   "encode_us": 43.21,
+   "decode_us": 36.07
+  },
+  {
+   "message": "FIND_NODE_RESPONSE (3 контакта)",
+   "format": "MessagePack",
+   "bytes": 658,
+   "encode_us": 4.75,
+   "decode_us": 3.79
+  },
+  {
+   "message": "FIND_NODE_RESPONSE (3 контакта)",
+   "format": "CBOR (canonical)",
+   "bytes": 658,
+   "encode_us": 40.16,
+   "decode_us": 9.89
+  },
+  {
+   "message": "STORE_REQUEST (NodeRecord)",
+   "format": "JSON (+base64)",
+   "bytes": 698,
+   "encode_us": 30.77,
+   "decode_us": 24.22
+  },
+  {
+   "message": "STORE_REQUEST (NodeRecord)",
+   "format": "MessagePack",
+   "bytes": 491,
+   "encode_us": 3.23,
+   "decode_us": 3.54
+  },
+  {
+   "message": "STORE_REQUEST (NodeRecord)",
+   "format": "CBOR (canonical)",
+   "bytes": 491,
+   "encode_us": 53.24,
+   "decode_us": 8.69
+  },
+  {
+   "message": "TUNNEL_DATA (32 КиБ)",
+   "format": "JSON (+base64)",
+   "bytes": 43772,
+   "encode_us": 276.81,
+   "decode_us": 177.55
+  },
+  {
+   "message": "TUNNEL_DATA (32 КиБ)",
+   "format": "MessagePack",
+   "bytes": 32812,
+   "encode_us": 3.44,
+   "decode_us": 2.37
+  },
+  {
+   "message": "TUNNEL_DATA (32 КиБ)",
+   "format": "CBOR (canonical)",
+   "bytes": 32811,
+   "encode_us": 11.02,
+   "decode_us": 4.21
+  }
+ ]
+}
