@@ -5,7 +5,9 @@
 опрошенных кандидатов из W (ближайшие первыми), ответы объединяются, дубликаты
 удаляются. Поиск завершается, когда все кандидаты W ответили (опрос остальных
 не может улучшить список k ближайших), либо пул кандидатов исчерпан, либо (для
-FIND_VALUE) получена валидная запись. Отказавшие кандидаты повторно не опрашиваются;
+FIND_VALUE) окно сошлось. Для FIND_VALUE собираются все валидные копии записи и
+выбирается копия с наибольшим sequence_number (копия с меньшим номером — устаревшая
+или попытка отката). Отказавшие кандидаты повторно не опрашиваются;
 если из-за отказов в пуле меньше k живых кандидатов, он пополняется следующими по
 близости контактами собственной таблицы.
 """
@@ -55,6 +57,7 @@ class LookupResult:
     table_size_before: int = 0
     found_by: str | None = None
     intermediate_nodes: list = field(default_factory=list)
+    record_copies: list = field(default_factory=list)      # (responder, sequence_number)
 
     def to_dict(self) -> dict:
         return {
@@ -67,6 +70,8 @@ class LookupResult:
             "target_in_table_before": self.target_in_table_before, "table_size_before": self.table_size_before,
             "found_by": self.found_by, "intermediate_nodes": self.intermediate_nodes,
             "intermediate_count": len(self.intermediate_nodes),
+            "record_copies": self.record_copies,
+            "record_seq": self.record["sequence_number"] if self.record else None,
         }
 
 
@@ -144,15 +149,15 @@ class Lookup:
                         round_info["new"] += 1
                         if nc.node_id == self.target and res.found_by is None:
                             res.found_by = nid
-                if record is not None and res.record is None:
-                    res.record, res.record_from = record, nid
+                if record is not None:
+                    res.record_copies.append([nid[:8], record["sequence_number"]])
+                    if res.record is None or record["sequence_number"] > res.record["sequence_number"]:
+                        res.record, res.record_from = record, nid
             res.rounds.append(round_info)
             self.node.log.emit("lookup.iteration", lookup=res.lookup_id, iteration=res.iterations,
                                queried=",".join(q[:8] for q in round_info["queried"]),
                                responded=len(round_info["responded"]), failed=len(round_info["failed"]),
                                new=round_info["new"])
-            if self.kind == "value" and res.record is not None:
-                break
         ok_sorted = sorted((c for c in self.cands.values() if c.state == OK), key=lambda c: c.distance)
         res.closest = [c.contact for c in ok_sorted[:self.k]]
         if self.kind == "node":

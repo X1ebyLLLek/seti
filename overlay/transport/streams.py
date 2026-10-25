@@ -73,6 +73,7 @@ class TlsStream(ByteStream):
         self.obj = ctx.wrap_bio(self.incoming, self.outgoing, server_side=server_side)
         self.peer_desc = inner.peer_desc
         self._closed = False
+        self._unread = b""
 
     def _flush(self) -> None:
         data = self.outgoing.read()
@@ -108,7 +109,14 @@ class TlsStream(ByteStream):
     async def drain(self) -> None:
         await self.inner.drain()
 
+    def unread(self, data: bytes) -> None:
+        """Вернуть уже расшифрованные байты: их первыми получит следующий recv()."""
+        self._unread = data + self._unread
+
     async def recv(self) -> bytes:
+        if self._unread:
+            data, self._unread = self._unread, b""
+            return data
         while True:
             try:
                 data = self.obj.read(READ_CHUNK)

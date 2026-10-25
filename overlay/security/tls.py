@@ -11,6 +11,10 @@
     самоподписан, а потому что его ключ хэшируется в ожидаемый/заявленный NodeID,
     а владение закрытым ключом доказывается подписью CertificateVerify.
  5. После рукопожатия: версия == TLSv1.3 и сертификат собеседника побайтно равен закреплённому.
+ 6. Подтверждение транскрипта: каждая сторона первыми байтами внутри TLS отправляет
+    T = SHA-256("overlay-hello-transcript-v1" || payload(SECURE_HELLO) || payload(SECURE_HELLO_ACK))
+    и сверяет значение собеседника. Так открытые HELLO-кадры (nonce, purpose) оказываются
+    под защитой аутентифицированного канала: их подмена MITM обнаруживается.
 session_id = SHA-256("overlay-session-v1" || nonce_c || nonce_s)[:16].
 Защиту от replay внутри сессии и между сессиями обеспечивают номера записей TLS и
 свежие ephemeral-ключи каждого рукопожатия; прикладная дедупликация — по message_id.
@@ -19,6 +23,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import hmac
 import os
 import ssl
 from dataclasses import dataclass
@@ -100,8 +105,8 @@ class SecurityProvider:
         nonce_c = os.urandom(16)
         hello = {"node_id": self.identity.node_id, "certificate": self.cert_der, "nonce": nonce_c,
                  "purpose": purpose}
-        stream.write(encode_frame(Frame(MsgType.SECURE_HELLO, new_request_id(),
-                                        encode_payload(MsgType.SECURE_HELLO, hello))))
+        hello_raw = encode_payload(MsgType.SECURE_HELLO, hello)
+        stream.write(encode_frame(Frame(MsgType.SECURE_HELLO, new_request_id(), hello_raw)))
         await stream.drain()
         frame, rest = await _read_one_frame(stream)
         if frame.type == MsgType.ERROR:
@@ -115,7 +120,9 @@ class SecurityProvider:
         peer_pk = _check_binding(ack["node_id"], ack["certificate"])
         tls = TlsStream(stream, self._context(False, ack["certificate"]), server_side=False)
         tls.feed_raw(rest)
-        return await self._finish(tls, ack["node_id"], peer_pk, ack["certificate"], nonce_c, ack["nonce"], purpose)
+        transcript = self.transcript(hello_raw, frame.payload)
+        return await self._finish(tls, ack["node_id"], peer_pk, ack["certificate"], nonce_c, ack["nonce"], purpose,
+                                  transcript)
 
     async def secure_server(self, stream: ByteStream, purpose: str = "link") -> SecureResult:
         frame, rest = await _read_one_frame(stream)
@@ -129,16 +136,20 @@ class SecurityProvider:
             raise SecureHandshakeError("peer claims our own NodeID")
         nonce_s = os.urandom(16)
         ack = {"node_id": self.identity.node_id, "certificate": self.cert_der, "nonce": nonce_s}
-        stream.write(encode_frame(Frame(MsgType.SECURE_HELLO_ACK, frame.request_id,
-                                        encode_payload(MsgType.SECURE_HELLO_ACK, ack))))
+        ack_raw = encode_payload(MsgType.SECURE_HELLO_ACK, ack)
+        stream.write(encode_frame(Frame(MsgType.SECURE_HELLO_ACK, frame.request_id, ack_raw)))
         await stream.drain()
         tls = TlsStream(stream, self._context(True, hello["certificate"]), server_side=True)
         tls.feed_raw(rest)
         return await self._finish(tls, hello["node_id"], peer_pk, hello["certificate"], hello["nonce"], nonce_s,
-                                  purpose)
+                                  purpose, self.transcript(frame.payload, ack_raw))
+
+    @staticmethod
+    def transcript(hello_payload: bytes, ack_payload: bytes) -> bytes:
+        return hashlib.sha256(b"overlay-hello-transcript-v1" + hello_payload + ack_payload).digest()
 
     async def _finish(self, tls: TlsStream, peer_id: bytes, peer_pk: bytes, pinned: bytes, nonce_c: bytes,
-                      nonce_s: bytes, purpose: str) -> SecureResult:
+                      nonce_s: bytes, purpose: str, transcript: bytes) -> SecureResult:
         try:
             await tls.handshake()
         except ssl.SSLError as exc:
@@ -147,6 +158,20 @@ class SecurityProvider:
             raise SecureHandshakeError(f"unexpected TLS version {tls.version}")
         if tls.obj.getpeercert(binary_form=True) != pinned:
             raise IdentityMismatch("identity mismatch: TLS certificate differs from announced")
+        tls.write(transcript)
+        await tls.drain()
+        got = b""
+        while len(got) < len(transcript):
+            try:
+                chunk = await tls.recv()
+            except ssl.SSLError as exc:
+                raise SecureHandshakeError(f"TLS error: {exc.reason or exc}") from None
+            if not chunk:
+                raise SecureHandshakeError("closed before transcript confirmation")
+            got += chunk
+        tls.unread(got[len(transcript):])
+        if not hmac.compare_digest(got[:len(transcript)], transcript):
+            raise SecureHandshakeError("hello transcript mismatch (HELLO tampered)")
         sid = self.session_id(nonce_c, nonce_s)
         self.log.emit("secure.established", purpose=purpose, peer=short(peer_id), session=short(sid),
                       version=tls.version, cipher=tls.cipher)
