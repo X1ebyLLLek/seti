@@ -1,0 +1,17 @@
+{
+ "description": "NodeID = SHA-256(ASCII('ed25519') || 0x00 || raw_public_key_32)",
+ "vectors": [
+  {
+   "public_key": "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a",
+   "node_id": "40302329e41f3cc765c446cc3902ec77056e35ec0b89ffff383ed45214d7c5b0"
+  },
+  {
+   "public_key": "3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c",
+   "node_id": "ce81b52c0d9bc6abe8cd5c8a2d8032c0c6d1fa65ee116377c8a19af88de84482"
+  },
+  {
+   "public_key": "fc51cd8e6218a1a38da47ed00230f0580816ed13ba3303ac5deb911548908025",
+   "node_id": "dd2496582bd6129777f0664f3d3d0026b7e7340c1ff329ba14c26242ea77990a"
+  }
+ ]
+}

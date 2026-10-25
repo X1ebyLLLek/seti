@@ -1,0 +1,4 @@
+cryptography>=41
+msgpack>=1.0
+pytest>=7
+matplotlib>=3.5

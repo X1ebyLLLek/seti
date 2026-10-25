@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+# каталоги состояния узлов содержат закрытые identity-ключи — в репозиторий не попадают
+state/
+runs/
+*.pem
+control.json
+# исходные файлы задания с пробелами в именах (копии лежат в docs/assignment/)
+/Etapy_1-2_*.md
+/TZ_*.md
