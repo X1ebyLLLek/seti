@@ -1,0 +1,17 @@
+{
+ "scheme": "star",
+ "seed": 3,
+ "n": 15,
+ "k": 3,
+ "full": false,
+ "join_all_s": 9.638,
+ "convergence": {
+  "converged": true,
+  "convergence_s": 9.909,
+  "rounds": 2
+ },
+ "lookups": {
+  "count": 30,
+  "success": 30
+ }
+}

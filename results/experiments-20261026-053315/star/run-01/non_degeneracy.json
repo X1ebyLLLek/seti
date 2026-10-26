@@ -1,0 +1,16 @@
+{
+ "no_full_registry": true,
+ "share_nodes_below_n_minus_1": 1.0,
+ "c2_80pct_below_n_minus_1": true,
+ "absent_target_lookups": 30,
+ "c3_at_least_30_absent": true,
+ "c4_each_uses_intermediate": true,
+ "absent_success_rate": 1.0,
+ "after_bootstrap_lookups": 10,
+ "c5_works_without_bootstrap": true,
+ "c6_data_saved": true,
+ "max_table_size": 11,
+ "min_table_size": 6,
+ "n": 15,
+ "non_degenerate": true
+}

@@ -1,6 +1,0 @@
-injection,fault,src,dst,killed_relay,relay_position,old_route,detection_ms,dead_reason,reroute_ms,delivery_recovery_ms,new_route,new_route_excludes_failed,messages_after_kill,failed_after_kill,duplicates_after_kill,t_kill
-1,kill,10,9,11,1,580cbd1e->146d1cc3->a26761c7->33b1d56e,3.0,first hop link lost,15.0,34.9,580cbd1e->9bb16417->71745c04->33b1d56e,True,4,0,0,1792979300.6629672
-2,kill,11,6,2,2,146d1cc3->27c1dba0->0a1af9f5->47697023,4.5,TUNNEL_CLOSE from 27c1dba0: next hop lost,15.5,50.4,146d1cc3->71745c04->f5d9b9af->47697023,True,4,0,0,1792979302.0045278
-3,kill,14,5,4,1,2984bec0->a26761c7->71745c04->e33df06e,4.1,first hop link lost,16.1,47.2,2984bec0->33b1d56e->27c1dba0->e33df06e,True,4,0,0,1792979303.2648869
-4,kill,13,11,2,2,f55bd9c1->47697023->0a1af9f5->146d1cc3,1.9,TUNNEL_CLOSE from 47697023: next hop lost,11.9,33.2,f55bd9c1->e33df06e->dd48463c->146d1cc3,True,4,0,0,1792979304.6621115
-5,kill,13,7,4,1,f55bd9c1->a26761c7->dd48463c->9bb16417,0.6,first hop link lost,9.6,32.8,f55bd9c1->a16aa8cf->0a1af9f5->9bb16417,True,4,0,0,1792979306.0044343

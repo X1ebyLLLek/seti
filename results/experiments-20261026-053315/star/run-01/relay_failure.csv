@@ -1,0 +1,6 @@
+injection,fault,src,dst,killed_relay,relay_position,old_route,detection_ms,dead_reason,reroute_ms,delivery_recovery_ms,new_route,new_route_excludes_failed,messages_after_kill,failed_after_kill,duplicates_after_kill,t_kill
+1,kill,3,4,7,1,ee8ccf93->fc68e7f8->a53af3ff->5649be5a,1.3,first hop link lost,8.3,47.5,ee8ccf93->e0e8561a->f19fecd3->5649be5a,True,4,0,0,1792982028.2047417
+2,kill,14,8,7,2,10d7e0c2->71c1de39->fc68e7f8->fdf450e5,2.5,TUNNEL_CLOSE from 71c1de39: next hop lost,13.5,64.7,10d7e0c2->71c1de39->02b0a448->fdf450e5,True,4,0,0,1792982029.5695071
+3,kill,13,11,10,1,85023c58->a53af3ff->fc68e7f8->9921eeb8,0.5,first hop link lost,10.5,50.2,85023c58->95935345->71c1de39->9921eeb8,True,4,0,0,1792982030.9565
+4,kill,2,14,9,2,71c1de39->5649be5a->02b0a448->10d7e0c2,2.9,TUNNEL_CLOSE from 5649be5a: next hop lost,11.9,33.2,71c1de39->f19fecd3->5649be5a->10d7e0c2,True,4,0,0,1792982032.3040535
+5,kill,3,10,4,1,ee8ccf93->5649be5a->f19fecd3->a53af3ff,4.8,TUNNEL_CLOSE from f19fecd3: next hop lost,19.8,48.3,ee8ccf93->71c1de39->fc68e7f8->a53af3ff,True,4,0,0,1792982033.627228

@@ -1,0 +1,26 @@
+{
+ "mode": "plain",
+ "pcap": "control_plain.pcap",
+ "pcap_bytes": 149186,
+ "nodes": 6,
+ "message_status": [
+  "delivered",
+  "delivered"
+ ],
+ "route": [
+  "9c9b45f6",
+  "3bbf7936",
+  "266f3d2f",
+  "b4209749"
+ ],
+ "delivered_text_matches": true,
+ "marker_in_pcap": false,
+ "control_strings_in_pcap": {
+  "identity_public_key": true,
+  "target_node_id": true,
+  "127.0.0.1": true
+ },
+ "bytes_c2s": 49581,
+ "bytes_s2c": 67941,
+ "flows": 30
+}

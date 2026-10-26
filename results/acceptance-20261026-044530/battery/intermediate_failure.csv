@@ -1,6 +1,0 @@
-scenario,initiator,target,lookup_id,success,target_in_table_before,table_size_before,rpc_count,iterations,intermediate_count,timeouts,errors,duration_ms,found_by,queried_by_iteration,injection,killed,killed_in_first_round
-intermediate_failure,6,7,fd6cec320040,True,False,9,4,2,2,0,1,2023.123,0d82b63a,"15a77751,0d82b63a,2c9250c0|1d7d4fd2",1,2,True
-intermediate_failure,5,6,cf0796ca3c74,True,False,8,6,3,4,0,1,2041.791,0d82b63a,"654d5b88,0d82b63a,15a77751|63ffe266,56291213|77e7ee44",2,3,True
-intermediate_failure,6,10,3c3bfe45d292,True,False,9,6,3,4,0,1,2044.032,ba213f1a,"f0ca373e,ba213f1a,9f3e00db|e2438598,f3fa79f0|fcaefa12",3,4,True
-intermediate_failure,8,6,bf5a5e00da74,True,False,8,6,3,4,0,1,2022.385,0d82b63a,"654d5b88,0d82b63a,1d7d4fd2|63ffe266,56291213|77e7ee44",4,3,True
-intermediate_failure,7,14,cf6acbfaecb3,True,False,9,7,3,5,0,1,2047.299,f0ca373e,"ba213f1a,af65139a,9f3e00db|f0ca373e,f3fa79f0,e2438598|fcaefa12",5,5,True

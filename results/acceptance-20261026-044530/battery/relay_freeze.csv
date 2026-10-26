@@ -1,6 +1,0 @@
-injection,fault,src,dst,killed_relay,relay_position,old_route,detection_ms,dead_reason,reroute_ms,delivery_recovery_ms,new_route,new_route_excludes_failed,messages_after_kill,failed_after_kill,duplicates_after_kill,t_kill
-1,freeze,14,5,13,1,fcaefa12->56291213->e2438598->ba213f1a,3561.9,no TUNNEL_ACK for 2 intervals,3570.9,3768.0,fcaefa12->654d5b88->9f3e00db->ba213f1a,True,4,0,0,1792979211.031114
-2,freeze,12,4,5,2,2c9250c0->af65139a->ba213f1a->f0ca373e,4042.8,no TUNNEL_ACK for 2 intervals,4052.8,4247.4,2c9250c0->654d5b88->1d7d4fd2->f0ca373e,True,4,0,0,1792979216.1092443
-3,freeze,10,8,14,1,e2438598->fcaefa12->0d82b63a->9f3e00db,3075.3,no TUNNEL_ACK for 2 intervals,3083.3,3263.6,e2438598->15a77751->f3fa79f0->9f3e00db,True,4,0,0,1792979221.6897006
-4,freeze,2,11,13,2,15a77751->9f3e00db->56291213->f3fa79f0,3539.2,no TUNNEL_ACK for 2 intervals,3547.2,3740.2,15a77751->f0ca373e->1d7d4fd2->f3fa79f0,True,4,0,0,1792979226.263824
-5,freeze,7,9,6,1,1d7d4fd2->63ffe266->2c9250c0->af65139a,3570.2,no TUNNEL_ACK for 2 intervals,3580.2,3793.3,1d7d4fd2->0d82b63a->15a77751->af65139a,True,4,0,0,1792979231.3338497

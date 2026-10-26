@@ -1,0 +1,101 @@
+{
+ "stage1": {
+  "ping_pong_same_rid": true,
+  "burst": {
+   "sent": 100,
+   "matched": 100,
+   "min_size": 0,
+   "max_size": 47317,
+   "total_payload_bytes": 467747
+  },
+  "glued_ok": true,
+  "split_ok": true,
+  "oversized_rejected": true
+ },
+ "stage2": {
+  "partial_share": 1.0,
+  "tables": [
+   8,
+   6,
+   12,
+   12,
+   8,
+   11,
+   12,
+   6,
+   6,
+   12,
+   11,
+   6,
+   11,
+   12,
+   8
+  ],
+  "control_ok": 12,
+  "control_n": 12,
+  "after_bootstrap_ok": 5,
+  "after_bootstrap_n": 5,
+  "all_absent": true,
+  "all_intermediate": true
+ },
+ "demo_lookup": {
+  "lookup_id": "c498625428d3",
+  "kind": "node",
+  "purpose": "control",
+  "initiator": "e96d6c2c4ff1343ba892943246f666d9144f35e2501a15db5edd4e0d9c5e59b1",
+  "target": "2d85229ebda7acb99566ce9229ebf7613325dbc5e79cb213980a780b7ea8b301",
+  "success": true,
+  "closest": [
+   "2d85229ebda7acb99566ce9229ebf7613325dbc5e79cb213980a780b7ea8b301",
+   "2add6a44a3fdd02aa40993fc5d2b0755d056a7a7d1ebb86c63a0800d4bacd53c",
+   "2469ba62867d8ac4baebc4d6d0288d6a67ee2919ad1534b2107d6dc66e896d4b"
+  ],
+  "record_found": false,
+  "record_from": null,
+  "rpc_count": 4,
+  "iterations": 2,
+  "rounds": [
+   {
+    "iteration": 1,
+    "queried": [
+     "2add6a44a3fdd02aa40993fc5d2b0755d056a7a7d1ebb86c63a0800d4bacd53c",
+     "2469ba62867d8ac4baebc4d6d0288d6a67ee2919ad1534b2107d6dc66e896d4b",
+     "15777305332389b07a3e7156bedbbbd86755f63ce9acb8657c70d4e780ea844b"
+    ],
+    "responded": [
+     "2add6a44a3fdd02aa40993fc5d2b0755d056a7a7d1ebb86c63a0800d4bacd53c",
+     "2469ba62867d8ac4baebc4d6d0288d6a67ee2919ad1534b2107d6dc66e896d4b",
+     "15777305332389b07a3e7156bedbbbd86755f63ce9acb8657c70d4e780ea844b"
+    ],
+    "failed": [],
+    "new": 1
+   },
+   {
+    "iteration": 2,
+    "queried": [
+     "2d85229ebda7acb99566ce9229ebf7613325dbc5e79cb213980a780b7ea8b301"
+    ],
+    "responded": [
+     "2d85229ebda7acb99566ce9229ebf7613325dbc5e79cb213980a780b7ea8b301"
+    ],
+    "failed": [],
+    "new": 0
+   }
+  ],
+  "timeouts": [],
+  "errors": [],
+  "duration_ms": 2.964,
+  "target_in_table_before": false,
+  "table_size_before": 11,
+  "found_by": "2add6a44a3fdd02aa40993fc5d2b0755d056a7a7d1ebb86c63a0800d4bacd53c",
+  "intermediate_nodes": [
+   "2add6a44a3fdd02aa40993fc5d2b0755d056a7a7d1ebb86c63a0800d4bacd53c",
+   "2469ba62867d8ac4baebc4d6d0288d6a67ee2919ad1534b2107d6dc66e896d4b",
+   "15777305332389b07a3e7156bedbbbd86755f63ce9acb8657c70d4e780ea844b"
+  ],
+  "intermediate_count": 3,
+  "record_copies": [],
+  "record_seq": null
+ },
+ "passed": true
+}

@@ -20,7 +20,7 @@ from pptx.dml.color import RGBColor
 from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION, XL_LABEL_POSITION
 from pptx.enum.shapes import MSO_CONNECTOR, MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
-from pptx.util import Emu, Inches, Pt
+from pptx.util import Inches, Pt
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -170,16 +170,6 @@ def style_chart(chart, colors):
 
 
 # ====================================================================== данные
-def bucket_fill(scheme, ranks=6):
-    acc = collections.defaultdict(list)
-    for f in glob.glob(os.path.join(R.SERIES, scheme, "run-*", "tables.json")):
-        for v in json.load(open(f, encoding="utf-8")).values():
-            b = {int(k): c for k, c in v["buckets"].items()}
-            for j in range(ranks):
-                acc[j].append(b.get(255 - j, 0))
-    return [sum(acc[j]) / len(acc[j]) for j in range(ranks)]
-
-
 def bucket_forecast(n_other=14, k=3, ranks=6):
     out = []
     for j in range(ranks):
@@ -354,7 +344,7 @@ def s_kademlia(prs, n):
         [("Прогноз: ", {"bold": True}), ("E[min(3, Bin(14, 2^−(j+1)))] по bucket — 8,97 контакта на узел", {})],
     ], size=15, space_after=12)
     pred = bucket_forecast()
-    star, ring = bucket_fill("star"), bucket_fill("ring")
+    star, ring = R.bucket_fill("star"), R.bucket_fill("ring")
     cd = CategoryChartData()
     cd.categories = [f"{255 - j}" for j in range(6)]
     cd.add_series("прогноз", [round(v, 2) for v in pred])
@@ -493,7 +483,7 @@ def s_tunnel(prs, n):
     box(s, Inches(7.5), Inches(4.0), Inches(5.23), Inches(2.35), fill=MIST)
     text(s, Inches(7.75), Inches(4.15), Inches(4.8), Inches(2.1), [
         [("kill: ", {"bold": True}), ("ОС закрывает сокеты, сосед сразу шлёт TUNNEL_CLOSE", {})],
-        [("freeze: ", {"bold": True}), ("соединения живы, видно только отсутствие ACK: 2 с тайм-аут + 1 с зонд ≈ 3,5 с", {})],
+        [("freeze: ", {"bold": True}), ("соединения живы, видно только отсутствие ACK: 2 с тайм-аут + зонд и такт контроля = 3,0–3,6 с", {})],
         [("повтор ", {"bold": True}), ("с тем же message_id — получатель отвечает duplicate", {})]],
         size=14, space_after=6)
     footer(s, n)
@@ -546,7 +536,7 @@ def s_results(prs, n):
              (f"{ms_ok}/{len(ms)}", "сообщений доставлено\nчерез 2 ретранслятора"),
              (f"{R.num(st[('star', 'Lookup: RPC')]['median'], 0)} RPC", "медиана на lookup,\n2 итерации"),
              (f"{R.num(st[('star', 'Сообщение по установленной сессии, мс')]['median'], 1)} мс",
-              "сообщение по сессии\n(первое — ≈15 мс)")]
+              f"сообщение по сессии\n(первое — {R.num(st[('star', 'Первое сообщение, мс')]['median'], 0)} мс)")]
     for i, (v, l) in enumerate(stats):
         stat(s, M, Inches(1.85) + i * Inches(1.2), Inches(4.5), v, l, color=TEAL if i % 2 else INK, vsize=30)
     cd = CategoryChartData()
@@ -572,7 +562,8 @@ def s_results(prs, n):
     s.notes_slide.notes_text_frame.text = (
         "Все 300 контрольных поисков нашли узел, которого не было в таблице инициатора, обычно за 5 запросов и "
         "2 итерации — это согласуется с логарифмической оценкой. Все 80 сообщений доставлены через два "
-        "ретранслятора. Сообщение по готовой сессии идёт около полутора миллисекунд, первое — около 15, то есть "
+        f"ретранслятора. Сообщение по готовой сессии идёт около {R.num(st[('star', 'Сообщение по установленной сессии, мс')]['median'], 1)} мс, "
+        f"первое — около {R.num(st[('star', 'Первое сообщение, мс')]['median'], 0)} мс, то есть "
         "основная стоимость — установление сессии. Схема bootstrap на стоимость поиска не повлияла.")
 
 
@@ -581,10 +572,10 @@ def s_validity(prs, n):
     title(s, "Обсуждение и угрозы валидности", "Что объясняет числа и где их нельзя переносить")
     cards = [("≈ 2 с на отказ узла DHT", "Windows отклоняет подключение к закрытому порту через 2024–2043 мс "
               "(отдельный замер); алгоритм после этого сразу идёт к другим кандидатам", AMBER),
-             ("Один компьютер", "нет сетевых задержек и потерь, процессы делят процессор: выбросы 119–179 мс — "
-              "сразу после перезапуска узла", INK),
-             ("Сходимость ≈ 9,8 с", "задаётся последовательным запуском процессов; star/run-04 = 14 с — два процесса "
-              "стартовали по 1,9 с вместо 0,2 с", INK),
+             ("Один компьютер", "нет сетевых задержек, процессы делят процессор с другими приложениями: сообщение "
+              "по сессии 1,4–3,0 мс в разных прогонах одного кода", INK),
+             ("Сходимость ≈ 9,8 с", "задаётся последовательным запуском 15 процессов (паузы 0,3 с); различие star и "
+              "ring меньше разброса между запусками", INK),
              ("Вне модели угроз", "Sybil, Eclipse, глобальный наблюдатель, анонимность — не утверждаются", TEAL)]
     for i, (h_, d, col) in enumerate(cards):
         x = M + (i % 2) * Inches(6.15)
@@ -597,8 +588,8 @@ def s_validity(prs, n):
     footer(s, n)
     s.notes_slide.notes_text_frame.text = (
         "Два секунды при отказе узла DHT — это стек Windows: я отдельно замерил отклонение подключения к закрытому "
-        "порту, оно занимает те же две секунды. Все выбросы я разобрал по журналам: это запуск процессов и общий "
-        "процессор, а не алгоритм. Модель угроз сознательно не включает Sybil и Eclipse — это продвинутый уровень.")
+        "порту, оно занимает те же две секунды. Выбросы я разобрал по журналам: это перезапуск узлов сценариями и "
+        "общий процессор, а не алгоритм. Модель угроз сознательно не включает Sybil и Eclipse — это продвинутый уровень.")
 
 
 def s_end(prs, n):

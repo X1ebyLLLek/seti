@@ -1,0 +1,29 @@
+{
+ "code_version": "5ebcc62",
+ "seed": 1,
+ "start_time_unix": 1792981893.2632022,
+ "start_time_utc": "2026-10-26T02:31:33Z",
+ "time_base": "wall clock time.time() одного хоста (все процессы на одной машине); длительности — perf_counter",
+ "N": 15,
+ "K_BUCKET_SIZE": 3,
+ "ALPHA": 3,
+ "REPLICATION_FACTOR": 3,
+ "SECURITY_MODE": "tls",
+ "bootstrap_scheme": "star",
+ "start_delay_s": 0.3,
+ "timeouts_ms": {
+  "CONNECT_TIMEOUT_MS": 3000,
+  "READ_TIMEOUT_MS": 5000,
+  "PING_TIMEOUT_MS": 5000,
+  "TUNNEL_ACK_TIMEOUT_MS": 2000,
+  "TUNNEL_BUILD_TIMEOUT_MS": 8000,
+  "MESSAGE_ACK_TIMEOUT_MS": 6000
+ },
+ "record_ttl_s": 180,
+ "republish_interval_s": 90,
+ "refresh_interval_s": 60,
+ "tunnel_relays": 2,
+ "netem": "не применялся (упрощённый уровень; underlay — loopback одного хоста)",
+ "underlay": "все процессы на 127.0.0.1, полная IP-достижимость; star/ring — схемы bootstrap, не топологии",
+ "cluster_join_s": 9.017772436141968
+}
