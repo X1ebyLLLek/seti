@@ -153,7 +153,8 @@ def fig_messages(series, schemes, figdir):
             ("established_session", "rtt_ms", "Сообщение по установленной сессии")]):
         ax = axes[col]
         for y, sch in enumerate(schemes):
-            rows = [r for r in concat(series, sch, "messages.csv") if r["kind"] == kind and r[field]]
+            rows = [r for r in concat(series, sch, "messages.csv")
+                    if r["kind"] == kind and r[field] and r["status"] == "delivered"]
             vals = [float(r[field]) for r in rows]
             ax.scatter(vals, [y + (i % 5 - 2) * 0.05 for i in range(len(vals))], s=30, color=SERIES[sch],
                        edgecolor=SURFACE, linewidth=1, label=f"{sch} (n={len(vals)})", zorder=3)
@@ -244,7 +245,8 @@ def tables(series, schemes, plan) -> tuple[str, list[dict]]:
         runs = runs_of(series, sch)
         sums = [read_json(os.path.join(r, "summary.json"), {}) for r in runs]
         lk = concat(series, sch, "lookups.csv")
-        ms = concat(series, sch, "messages.csv")
+        ms_all = concat(series, sch, "messages.csv")
+        ms = [r for r in ms_all if r["status"] == "delivered"]       # задержки — только доставленных
         sizes = [v["size"] for r in runs for v in read_json(os.path.join(r, "tables.json"), {}).values()]
         out += [f"## Схема {sch}", "", HEADER,
                 add(sch, "Холодная сходимость, с", [s.get("convergence", {}).get("convergence_s") for s in sums], 2),
@@ -283,11 +285,17 @@ def tables(series, schemes, plan) -> tuple[str, list[dict]]:
                 f"- Невырожденность (запуск 1): {'выполнена' if nd.get('non_degenerate') else 'НЕ выполнена'}; "
                 f"узлов с < N−1 контактов: {nd.get('share_nodes_below_n_minus_1', 0):.0%}; "
                 f"максимальная таблица {nd.get('max_table_size')} при N−1={nd.get('n', 0) - 1}.",
+                f"- Доставлено сообщений: {len(ms)}/{len(ms_all)} (недоставленные в статистику задержек "
+                f"не входят).",
                 f"- FIND_VALUE после отказа хранителя: {sum(truthy(r['success_after']) for r in sf)}/{len(sf)}; "
                 f"lookup после отключения bootstrap: {sum(truthy(r['success']) for r in bs)}/{len(bs)}.",
                 f"- Отказ ретранслятора: доставка восстановлена в {sum(bool(r['delivery_recovery_ms']) for r in rf)}"
                 f"/{len(rf)} инъекций, новый маршрут без отказавшего узла — "
                 f"{sum(truthy(r['new_route_excludes_failed']) for r in rf)}/{len(rf)}.", ""]
+    out += ["Примечание. Длительности внутри узла (lookup, построение туннеля, RTT сообщения) измерены "
+            "монотонными часами высокого разрешения. Времена отказа ретранслятора сравнивают системные часы "
+            "оркестратора и узла (разрешение около 1 мс): значения 0 ± 1 мс означают обнаружение в пределах "
+            "разрешения часов.", ""]
     return "\n".join(out), stats_rows
 
 

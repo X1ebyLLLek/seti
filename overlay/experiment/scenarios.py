@@ -132,7 +132,10 @@ def storage_failure(cluster, rnd: random.Random, injections: int = 5) -> list[di
         if not victims:
             continue
         victim = rnd.choice(victims)
-        readers = [i for i in cluster.alive_nodes() if i not in (owner, victim)]
+        # Читатель не хранит запись: проверяется поиск по сети, а не чтение своей копии.
+        readers = [i for i in cluster.alive_nodes() if i not in (owner, victim) and i not in holders]
+        if not readers:
+            continue
         reader = rnd.choice(readers)
         before = cluster.call(reader, "get_record", node_id=cluster.node_ids[owner])
         t_kill = cluster.kill(victim)

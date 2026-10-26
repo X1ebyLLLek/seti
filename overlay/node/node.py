@@ -21,7 +21,7 @@ from ..dht import Lookup, LookupResult, RecordStore, make_record, record_key, va
 from ..dht.records import InvalidRecord, describe
 from ..identity import Identity
 from ..metrics import EventLog, now_ms, short
-from ..routing import Contact, RoutingManager, RoutingTable
+from ..routing import Contact, RoutingManager, RoutingTable, xor_distance
 from ..rpc import DhtRpc
 from ..security import SecurityProvider
 from ..transport import Dispatcher, RpcError, Transport
@@ -69,6 +69,7 @@ class Node:
         self.dispatcher = Dispatcher()
         self.rpc = DhtRpc(self)
         self.routing = RoutingManager(self.table, self.rpc.ping_contact, self.log, cfg.CONTACT_MAX_FAILS)
+        self.routing.on_added.append(self._hand_off_records)
         self.store = RecordStore(os.path.join(cfg.NODE_STATE_DIR, "storage.json"))
         restored = self.store.load(now_ms(), cfg.MAX_RECORD_BYTES)
         if restored:
@@ -83,6 +84,7 @@ class Node:
         self.tunnels = None          # TunnelManager (overlay.tunnel)
         self.messaging = None        # MessagingService (overlay.app)
         self._bg: list[asyncio.Task] = []
+        self._handoffs: set[asyncio.Task] = set()
         self.joined = False
         self.started_ms = now_ms()
         self._seq_path = os.path.join(cfg.NODE_STATE_DIR, "record_seq.json")
@@ -110,7 +112,7 @@ class Node:
         self._bg = [asyncio.ensure_future(self._maintenance_loop())]
 
     async def stop(self) -> None:
-        for t in self._bg:
+        for t in self._bg + list(self._handoffs):
             t.cancel()
         if self.tunnels:
             await self.tunnels.shutdown()
@@ -271,6 +273,41 @@ class Node:
 
     async def get_record(self, key: bytes, purpose: str = "control") -> LookupResult:
         return await Lookup(self, key, "value", purpose).run()
+
+    def local_record(self, key: bytes) -> dict | None:
+        """Действительная запись по ключу из собственного хранилища (или собственная запись владельца)."""
+        rec = self.store.get(key, now_ms())
+        own = self.own_record
+        if rec is None and own is not None and key == self.own_record_key and own["expires_at"] > now_ms():
+            rec = own
+        return rec
+
+    def _hand_off_records(self, contact: Contact) -> None:
+        """Передача записей новому контакту (Kademlia, §2.5 статьи Maymounkov–Mazières): если новый
+        узел входит в R ближайших к ключу хранимой записи, он получает STORE сразу, а не после
+        переопубликования. Иначе поиск, сходящийся на присоединившихся позже ближайших узлах,
+        не находил бы запись, хранящуюся на более дальних узлах."""
+        if not self.joined:
+            return
+        keys = set(self.store.keys())
+        if self.own_record is not None:
+            keys.add(self.own_record_key)
+        r = self.cfg.REPLICATION_FACTOR
+        for key in keys:
+            rec = self.local_record(key)
+            if rec is None or rec["node_id"] == contact.node_id:
+                continue
+            nearest = [c.node_id for c in self.table.closest(key, r)] + [self.identity.node_id]
+            nearest.sort(key=lambda nid: xor_distance(nid, key))
+            if contact.node_id in nearest[:r]:
+                task = asyncio.ensure_future(self._hand_off_one(contact, key, rec))
+                self._handoffs.add(task)
+                task.add_done_callback(self._handoffs.discard)
+
+    async def _hand_off_one(self, contact: Contact, key: bytes, rec: dict) -> None:
+        ok, reason = await self._store_one(contact, key, rec)
+        self.log.emit("record.handoff", key=short(key), owner=short(rec["node_id"]), to=contact.short(),
+                      seq=rec["sequence_number"], ok=ok, result=reason)
 
     async def resolve(self, node_id: bytes) -> Contact | None:
         """NodeID -> проверенный контакт через подписанную запись DHT."""

@@ -62,8 +62,8 @@ def run_tables(run_dir: str) -> str:
     st = read_csv(os.path.join(run_dir, "storage_failure.csv"))
     im = read_csv(os.path.join(run_dir, "intermediate_failure.csv"))
     summary = read_json(os.path.join(run_dir, "summary.json"), {})
-    first = [m for m in ms if m["kind"] == "first_message"]
-    est = [m for m in ms if m["kind"] == "established_session"]
+    first = [m for m in ms if m["kind"] == "first_message" and m["status"] == "delivered"]
+    est = [m for m in ms if m["kind"] == "established_session" and m["status"] == "delivered"]
     lines = [HEADER]
     conv = summary.get("convergence", {})
     if conv.get("convergence_s") is not None:
@@ -90,6 +90,10 @@ def run_tables(run_dir: str) -> str:
     lines.append("")
     lines.append(f"Успешных контрольных lookup: {lookups_ok} из {len(lk)} "
                  f"(доля {lookups_ok / len(lk):.2%})." if lk else "")
+    delivered = sum(m["status"] == "delivered" for m in ms)
+    lines.append(f"Доставлено сообщений: {delivered} из {len(ms)} (задержки — только по доставленным). "
+                 "Времена отказа ретранслятора сравнивают системные часы оркестратора и узла "
+                 "(разрешение около 1 мс), поэтому значения 0 ± 1 мс означают «в пределах разрешения часов».")
     return "\n".join(lines)
 
 

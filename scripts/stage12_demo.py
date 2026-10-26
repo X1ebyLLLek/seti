@@ -1,6 +1,6 @@
 """Демонстрация и контрольная точка этапов 1–2 (разделы 13.2 и 25 требований).
 
-    python scripts/stage12_demo.py                  # 10 узлов, star, режим без TLS (как на этапах 1–2)
+    python scripts/stage12_demo.py                  # 15 узлов, star, режим без TLS (как на этапах 1–2)
     python scripts/stage12_demo.py --nodes 6 --scheme ring
 
 Этап 1 (два независимых процесса): серверы на разных портах, исходящее соединение,
@@ -139,11 +139,9 @@ def stage2(out: str, run_dir: str, n: int, scheme: str, base_port: int, seed: in
         c.start_all()
         say(f"1–4. Seed-узел 1 запущен без BOOTSTRAP_PEERS; узлы 2..{n} присоединились за {time.time() - t0:.1f} с.")
         boot = []
-        for i in range(n):
+        for i in range(1, n):                      # seed-узлу не к кому присоединяться — bootstrap.json нет
             with open(os.path.join(c.state_dir(i), "bootstrap.json"), encoding="utf-8") as fh:
-                b = json.load(fh) if i else {}
-            if i == 0:
-                continue
+                b = json.load(fh)
             sl = b["self_lookup"]
             boot.append({"node": i + 1, "bootstrap_peers": ",".join(str(j + 1) for j in
                                                                     sc_bootstrap(scheme, i)),
@@ -159,7 +157,10 @@ def stage2(out: str, run_dir: str, n: int, scheme: str, base_port: int, seed: in
                   [{"node": k, "node_id": v["node_id"], "unique_contacts": v["size"],
                     "bucket_fill": json.dumps(v["buckets"])} for k, v in snap.items()])
         sizes = [v["size"] for v in snap.values()]
+        partial = sum(x < n - 1 for x in sizes)
+        res["partial_share"] = partial / n
         say(f"   Уникальных контактов в таблицах: {sizes} (N-1 = {n - 1}); k-bucket заполнены не более чем на k=3.")
+        say(f"   Узлов с таблицей меньше N-1: {partial} из {n} ({100 * partial / n:.0f}%, требуется не менее 80%).")
         pair = sc.pick_absent_pair(c, rnd)
         i, j = pair
         r = c.call(i, "lookup", target=c.node_ids[j])
@@ -196,7 +197,7 @@ def sc_bootstrap(scheme: str, i: int) -> list[int]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--nodes", type=int, default=10)
+    ap.add_argument("--nodes", type=int, default=15)
     ap.add_argument("--scheme", default="star", choices=["star", "ring"])
     ap.add_argument("--seed", type=int, default=5)
     ap.add_argument("--base-port", type=int, default=9401)
@@ -215,7 +216,8 @@ def main() -> int:
     r2 = stage2(out, run_dir, a.nodes, a.scheme, a.base_port, a.seed)
     ok = (r1["ping_pong_same_rid"] and r1["burst"]["matched"] == 100 and r1["glued_ok"] and r1["split_ok"]
           and r1["oversized_rejected"] and r2["control_ok"] == r2["control_n"] and r2["all_absent"]
-          and r2["all_intermediate"] and r2["after_bootstrap_ok"] == r2["after_bootstrap_n"])
+          and r2["all_intermediate"] and r2["after_bootstrap_ok"] == r2["after_bootstrap_n"]
+          and r2["partial_share"] >= 0.8)
     say("")
     say(f"**Итог: {'все пункты демонстрации выполнены' if ok else 'есть невыполненные пункты'}.**")
     write_json(os.path.join(out, "stage12_summary.json"), {"stage1": {k: v for k, v in r1.items() if k != "logs"},

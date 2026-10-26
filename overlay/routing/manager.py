@@ -17,6 +17,7 @@ class RoutingManager:
         self.max_fails = max_fails
         self._tasks: set[asyncio.Task] = set()
         self._addr_checks: set[bytes] = set()
+        self.on_added: list = []        # callbacks (Contact) — новый контакт попал в таблицу
 
     def observe(self, contact: Contact, verified: bool = True, reason: str = "message") -> asyncio.Task | None:
         """Применяет правила bucket. Если требуется сетевой шаг (PING LRU или проверка
@@ -26,6 +27,7 @@ class RoutingManager:
         if st is AddStatus.ADDED:
             self.log.emit("route.add", peer=contact.short(), bucket=res.bucket, reason=reason,
                           size=self.table.size())
+            self._notify_added(contact)
         elif st is AddStatus.UPDATED:
             self.log.emit("route.update", level="DEBUG", peer=contact.short(), bucket=res.bucket, reason=reason)
         elif st is AddStatus.CONFLICT:
@@ -44,6 +46,13 @@ class RoutingManager:
             bucket.check_in_progress = True
             return self._spawn(self._check_lru(res.bucket, res.lru, contact))
         return None
+
+    def _notify_added(self, contact: Contact) -> None:
+        for cb in list(self.on_added):
+            try:
+                cb(contact)
+            except Exception as exc:
+                self.log.emit("route.callback_error", level="ERROR", error=type(exc).__name__)
 
     def _spawn(self, coro) -> asyncio.Task:
         task = asyncio.ensure_future(coro)
@@ -68,6 +77,8 @@ class RoutingManager:
             added = self.table.replace_lru(lru.node_id, new, now_ms())
             self.log.emit("route.evict", bucket=index, evicted=lru.short(), added=new.short() if added else "-",
                           reason="LRU PING timeout", size=self.table.size())
+            if added:
+                self._notify_added(new)
 
     async def _verify_new_address(self, contact: Contact, old: Contact) -> None:
         try:

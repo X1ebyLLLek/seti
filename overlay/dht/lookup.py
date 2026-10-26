@@ -5,9 +5,9 @@
 опрошенных кандидатов из W (ближайшие первыми), ответы объединяются, дубликаты
 удаляются. Поиск завершается, когда все кандидаты W ответили (опрос остальных
 не может улучшить список k ближайших), либо пул кандидатов исчерпан, либо (для
-FIND_VALUE) окно сошлось. Для FIND_VALUE собираются все валидные копии записи и
-выбирается копия с наибольшим sequence_number (копия с меньшим номером — устаревшая
-или попытка отката). Отказавшие кандидаты повторно не опрашиваются;
+FIND_VALUE) окно сошлось. Для FIND_VALUE собираются все валидные копии записи (включая
+копию в собственном хранилище инициатора) и выбирается копия с наибольшим
+sequence_number (копия с меньшим номером — устаревшая или попытка отката). Отказавшие кандидаты повторно не опрашиваются;
 если из-за отказов в пуле меньше k живых кандидатов, он пополняется следующими по
 близости контактами собственной таблицы.
 """
@@ -116,6 +116,18 @@ class Lookup:
             table.buckets[bucket_index(self.local, self.target)].last_lookup_ms = now_ms()
         for c in table.closest(self.target, self.k):
             self._add(Contact(c.node_id, c.identity_public_key, c.host, c.port), "table")
+        if self.kind == "value":
+            # Собственная копия — одна из копий; сетевой поиск всё равно выполняется,
+            # и побеждает копия с наибольшим sequence_number.
+            # Перед использованием проверяется так же, как копия из сети.
+            local = self.node.local_record(self.target)
+            if local is not None:
+                try:
+                    validate_record(local, now_ms(), key=self.target, max_bytes=self.node.cfg.MAX_RECORD_BYTES)
+                    res.record, res.record_from = local, self.local.hex()
+                    res.record_copies.append(["local", local["sequence_number"]])
+                except InvalidRecord as exc:
+                    self.node.log.emit("lookup.bad_record", level="WARNING", source="local", code=exc.code)
         self.node.log.emit("lookup.start", lookup=res.lookup_id, kind=self.kind, purpose=res.purpose,
                            target=short(self.target),
                            seeds=len(self.cands), target_known=res.target_in_table_before)

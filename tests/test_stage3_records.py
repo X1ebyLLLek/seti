@@ -187,3 +187,52 @@ def test_publish_timestamps_and_lifetime(base):
     r = run(go())
     assert r["expires_at"] - r["issued_at"] == 150_000
     assert abs(r["issued_at"] - int(time.time() * 1000)) < 60_000
+
+
+@pytest.mark.parametrize("handoff", [True, False])
+def test_record_handed_off_to_closer_node_joining_later(base, handoff):
+    """Узел, присоединившийся после публикации и ставший ближайшим к ключу, получает запись
+    сразу (передача записей новому контакту). handoff=False — отрицательный контроль:
+    без передачи у нового узла записи нет, то есть проверка имеет силу."""
+    import os
+    from conftest import node_config
+    from overlay.identity import Identity
+    from overlay.node import Node
+    from overlay.routing import xor_distance
+
+    async def go():
+        nodes = await start_nodes(base, 6)
+        if not handoff:
+            for n in nodes:
+                n.routing.on_added.clear()
+        owner = nodes[2]
+        key = record_key(owner.identity.node_id)
+        res = await owner.publish_self()
+        best = min(xor_distance(n.identity.node_id, key) for n in nodes)
+        for attempt in range(200):                     # ключ нового узла ближе всех к ключу записи
+            state = os.path.join(str(base), f"late-{attempt}")
+            if xor_distance(Identity.load_or_create(state).node_id, key) < best:
+                break
+        late = Node(node_config(base, 0, NODE_STATE_DIR=state))
+        await late.start()
+        await late.join([f"127.0.0.1:{nodes[0].cfg.LISTEN_PORT}"])
+        for _ in range(50):                            # передача идёт фоновыми STORE
+            if late.store.get(key, now_ms()) or not handoff:
+                break
+            await asyncio.sleep(0.05)
+        await asyncio.sleep(0.3)
+        got = late.store.get(key, now_ms())
+        holder = next(n for n in nodes if n is not owner and n.store.get(key, now_ms()))
+        local = await holder.get_record(key)
+        await stop_nodes(nodes + [late])
+        return res, got, local
+
+    res, got, local = run(go(), timeout=120)
+    assert res.ok
+    if handoff:
+        assert got is not None
+    else:
+        assert got is None
+    # Хранитель учитывает свою копию, но побеждает копия с наибольшим sequence_number.
+    assert local.success and any(src == "local" for src, _ in local.record_copies)
+    assert local.record["sequence_number"] == max(seq for _, seq in local.record_copies)
