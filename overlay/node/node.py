@@ -306,8 +306,15 @@ class Node:
             mark = (contact.node_id, key, rec["sequence_number"])
             if mark in self._handed:
                 continue                           # эту версию записи этому узлу уже передавали
-            nearest = {c.node_id for c in self.table.closest(key, r)} | {self.identity.node_id, contact.node_id}
-            if contact.node_id in sorted(nearest, key=lambda nid: xor_distance(nid, key))[:r]:
+            # Передаёт только узел, сам входящий в R ближайших к ключу по своей таблице: у него полное
+            # знание окрестности ключа. Узел с разреженным видом на далёкую часть пространства иначе
+            # рассылал бы запись почти каждому новому контакту.
+            dist = lambda nid: xor_distance(nid, key)  # noqa: E731
+            holders = sorted({c.node_id for c in self.table.closest(key, r)} | {self.identity.node_id},
+                             key=dist)[:r]
+            if self.identity.node_id not in holders:
+                continue
+            if contact.node_id in sorted(set(holders) | {contact.node_id}, key=dist)[:r]:
                 if len(self._handed) > 10000:
                     self._handed.clear()
                 self._handed.add(mark)
