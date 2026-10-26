@@ -4,3 +4,5 @@
 *.pcap binary
 *.docx binary
 *.pptx binary
+# сырые результаты хранятся байт в байт, без нормализации переводов строк
+results/** -text

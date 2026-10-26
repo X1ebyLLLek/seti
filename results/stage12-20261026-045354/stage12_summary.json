@@ -1,0 +1,104 @@
+{
+ "stage1": {
+  "ping_pong_same_rid": true,
+  "burst": {
+   "sent": 100,
+   "matched": 100,
+   "min_size": 0,
+   "max_size": 47317,
+   "total_payload_bytes": 467747
+  },
+  "glued_ok": true,
+  "split_ok": true,
+  "oversized_rejected": true
+ },
+ "stage2": {
+  "partial_share": 1.0,
+  "tables": [
+   9,
+   8,
+   10,
+   7,
+   9,
+   10,
+   10,
+   10,
+   8,
+   7,
+   10,
+   8,
+   7,
+   9,
+   7
+  ],
+  "control_ok": 12,
+  "control_n": 12,
+  "after_bootstrap_ok": 5,
+  "after_bootstrap_n": 5,
+  "all_absent": true,
+  "all_intermediate": true
+ },
+ "demo_lookup": {
+  "lookup_id": "7bb2870c0ee5",
+  "kind": "node",
+  "purpose": "control",
+  "initiator": "7412be34bc733e9a7de195673260d147ceef11358d8dc9088ff341a3d145c79f",
+  "target": "f138df3606856a11e9dc9538128499e78af4ad3fb705beeb36f6296fbe38ecb5",
+  "success": true,
+  "closest": [
+   "f138df3606856a11e9dc9538128499e78af4ad3fb705beeb36f6296fbe38ecb5",
+   "f1e5b35ea45b0dea478985cc5c7371de2fb7d0e7bfe6a4db5df4e355aa7fb8e6",
+   "e0b34f3787a688f8b00d640dc087fe90f7937cc8e2979a0be7caccd528fc3859"
+  ],
+  "record_found": false,
+  "record_from": null,
+  "rpc_count": 5,
+  "iterations": 2,
+  "rounds": [
+   {
+    "iteration": 1,
+    "queried": [
+     "e0b34f3787a688f8b00d640dc087fe90f7937cc8e2979a0be7caccd528fc3859",
+     "e7de74820a208f52bc82529ecea33901384570b662cc820269dca66588e9a665",
+     "ead740dc25e14a7b730afd237e191eaf11301ebcbb4b4328e18cc5dbcd4bfc36"
+    ],
+    "responded": [
+     "e0b34f3787a688f8b00d640dc087fe90f7937cc8e2979a0be7caccd528fc3859",
+     "e7de74820a208f52bc82529ecea33901384570b662cc820269dca66588e9a665",
+     "ead740dc25e14a7b730afd237e191eaf11301ebcbb4b4328e18cc5dbcd4bfc36"
+    ],
+    "failed": [],
+    "new": 2
+   },
+   {
+    "iteration": 2,
+    "queried": [
+     "f138df3606856a11e9dc9538128499e78af4ad3fb705beeb36f6296fbe38ecb5",
+     "f1e5b35ea45b0dea478985cc5c7371de2fb7d0e7bfe6a4db5df4e355aa7fb8e6"
+    ],
+    "responded": [
+     "f138df3606856a11e9dc9538128499e78af4ad3fb705beeb36f6296fbe38ecb5",
+     "f1e5b35ea45b0dea478985cc5c7371de2fb7d0e7bfe6a4db5df4e355aa7fb8e6"
+    ],
+    "failed": [],
+    "new": 0
+   }
+  ],
+  "timeouts": [],
+  "errors": [],
+  "duration_ms": 4.084,
+  "target_in_table_before": false,
+  "table_size_before": 7,
+  "found_by": "e0b34f3787a688f8b00d640dc087fe90f7937cc8e2979a0be7caccd528fc3859",
+  "intermediate_nodes": [
+   "e0b34f3787a688f8b00d640dc087fe90f7937cc8e2979a0be7caccd528fc3859",
+   "e7de74820a208f52bc82529ecea33901384570b662cc820269dca66588e9a665",
+   "ead740dc25e14a7b730afd237e191eaf11301ebcbb4b4328e18cc5dbcd4bfc36",
+   "f1e5b35ea45b0dea478985cc5c7371de2fb7d0e7bfe6a4db5df4e355aa7fb8e6"
+  ],
+  "intermediate_count": 4,
+  "record_copies": [],
+  "record_seq": null
+ },
+ "passed": true
+}

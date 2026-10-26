@@ -188,7 +188,7 @@ def fig_relay_failure(series, schemes, figdir):
                 ax.annotate(f"{med:.0f} мс", (med, y + 0.32), color=INK2, fontsize=8, ha="center")
         ax.set_yticks(range(len(metrics)), [lbl for _, lbl in metrics])
         ax.set_ylim(-0.6, len(metrics) - 0.2)
-        ax.set_xlabel(f"время от инъекции отказа, мс (n={len(rows)} инъекций)")
+        ax.set_xlabel(f"мс от инъекции отказа (n={len(rows)})")
         ax.set_title(title, fontsize=10)
     save(fig, os.path.join(figdir, "relay_failure.png"))
 
@@ -205,7 +205,11 @@ def fig_graphs(series, schemes, figdir):
         boot = read_json(os.path.join(run, "bootstrap_graph.json"), [])
         ids = {k: int(v["node_id"], 16) for k, v in snap.items()}
         by_hex = {v["node_id"]: k for k, v in snap.items()}
-        pos = {k: (math.cos(2 * math.pi * x / 2 ** 256), math.sin(2 * math.pi * x / 2 ** 256)) for k, x in ids.items()}
+        # Равномерно по окружности в порядке возрастания NodeID: порядок XOR-пространства
+        # сохраняется, а узлы с близкими идентификаторами не накладываются друг на друга.
+        order = sorted(ids, key=ids.get)
+        pos = {k: (math.cos(2 * math.pi * r / len(order)), math.sin(2 * math.pi * r / len(order)))
+               for r, k in enumerate(order)}
         for col, title in enumerate(["bootstrap-граф (начальные контакты)", "DHT-overlay (содержимое k-bucket)"]):
             ax = axes[row][col]
             ax.set_aspect("equal")
@@ -223,8 +227,11 @@ def fig_graphs(series, schemes, figdir):
                 ax.scatter([x], [y], s=150, color=SERIES[sch], edgecolor=SURFACE, linewidth=2, zorder=3)
                 ax.annotate(k_, (x, y), color=SURFACE, fontsize=7, ha="center", va="center", zorder=4,
                             fontweight="bold")
-            ax.set_title(f"{sch}: {title}\nрёбер: {len(edges)}", fontsize=9)
-    fig.suptitle("Узлы расположены по окружности в порядке NodeID (XOR-пространство)", fontsize=9, color=INK2)
+            pairs = len({frozenset(e) for e in edges})
+            count = f"рёбер: {len(edges)}" if col == 0 else f"контактов в таблицах: {len(edges)}, пар узлов: {pairs}"
+            ax.set_title(f"{sch}: {title}\n{count}", fontsize=9)
+    fig.suptitle("Узлы равномерно расположены по окружности в порядке возрастания NodeID", fontsize=9,
+                 color=INK2)
     save(fig, os.path.join(figdir, "graphs.png"))
 
 

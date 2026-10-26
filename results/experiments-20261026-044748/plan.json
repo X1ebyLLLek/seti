@@ -1,0 +1,17 @@
+{
+ "code_version": "902f68c",
+ "started_utc": "2026-10-26T01:47:48Z",
+ "nodes": 15,
+ "k": 3,
+ "alpha": 3,
+ "replication": 3,
+ "runs_per_scheme": 5,
+ "schemes": [
+  "star",
+  "ring"
+ ],
+ "lookups_per_run": 30,
+ "factor": "bootstrap scheme",
+ "full_battery": "run 1 of each scheme",
+ "duration_s": 301.0
+}

@@ -1,0 +1,17 @@
+{
+ "scheme": "ring",
+ "seed": 3,
+ "n": 15,
+ "k": 3,
+ "full": false,
+ "join_all_s": 9.186,
+ "convergence": {
+  "converged": true,
+  "convergence_s": 9.493,
+  "rounds": 2
+ },
+ "lookups": {
+  "count": 30,
+  "success": 30
+ }
+}

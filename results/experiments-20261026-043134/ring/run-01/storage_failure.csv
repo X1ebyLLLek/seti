@@ -1,0 +1,6 @@
+injection,owner,holders,holder_ids,killed_holder,reader,success_before,success_after,rpc_after,iterations_after,timeouts_after,errors_after,duration_after_ms,record_seq,record_from,t_kill
+1,8,5,"2,5,6,13,14",2,14,True,True,3,1,0,0,2.801,2,68a2007f,1792978401.9585717
+2,6,5,"1,2,3,9,15",9,14,True,True,6,2,0,1,2023.785,2,cb9e6cf9,1792978402.4507067
+3,4,6,"1,2,3,11,13,14",11,15,True,True,4,2,0,1,2011.83,2,736d7188,1792978404.847282
+4,8,5,"2,5,6,13,14",2,13,True,True,3,1,0,0,2.004,3,676347f1,1792978407.2190304
+5,6,5,"1,2,3,9,15",2,9,True,True,4,2,0,1,2011.867,3,dd841705,1792978407.6944704

@@ -1,0 +1,268 @@
+[
+ {
+  "scheme": "star",
+  "run": 1,
+  "seed": 1,
+  "n": 15,
+  "k": 3,
+  "full": true,
+  "join_all_s": 9.157,
+  "convergence": {
+   "converged": true,
+   "convergence_s": 9.441,
+   "rounds": 2
+  },
+  "lookups": {
+   "count": 30,
+   "success": 30
+  },
+  "relay_freeze": {
+   "injections": 5,
+   "recovered": 5
+  },
+  "storage_failure": {
+   "injections": 5,
+   "success_after": 5
+  },
+  "intermediate_failure": {
+   "injections": 5,
+   "success": 5
+  },
+  "messages": {
+   "count": 40,
+   "delivered": 39,
+   "min_relays": 2
+  },
+  "relay_failure": {
+   "injections": 5,
+   "recovered": 5,
+   "new_route_excludes_failed": 5
+  },
+  "bootstrap_shutdown": {
+   "count": 10,
+   "success": 10
+  },
+  "non_degeneracy": {
+   "no_full_registry": true,
+   "share_nodes_below_n_minus_1": 1.0,
+   "c2_80pct_below_n_minus_1": true,
+   "absent_target_lookups": 30,
+   "c3_at_least_30_absent": true,
+   "c4_each_uses_intermediate": true,
+   "absent_success_rate": 1.0,
+   "after_bootstrap_lookups": 10,
+   "c5_works_without_bootstrap": true,
+   "c6_data_saved": true,
+   "max_table_size": 10,
+   "min_table_size": 6,
+   "n": 15,
+   "non_degenerate": true
+  },
+  "logs": "node_logs.zip"
+ },
+ {
+  "scheme": "ring",
+  "run": 1,
+  "seed": 1,
+  "n": 15,
+  "k": 3,
+  "full": true,
+  "join_all_s": 9.092,
+  "convergence": {
+   "converged": true,
+   "convergence_s": 9.377,
+   "rounds": 2
+  },
+  "lookups": {
+   "count": 30,
+   "success": 30
+  },
+  "relay_freeze": {
+   "injections": 5,
+   "recovered": 5
+  },
+  "storage_failure": {
+   "injections": 5,
+   "success_after": 5
+  },
+  "intermediate_failure": {
+   "injections": 5,
+   "success": 5
+  },
+  "messages": {
+   "count": 40,
+   "delivered": 40,
+   "min_relays": 2
+  },
+  "relay_failure": {
+   "injections": 5,
+   "recovered": 5,
+   "new_route_excludes_failed": 5
+  },
+  "bootstrap_shutdown": {
+   "count": 10,
+   "success": 10
+  },
+  "non_degeneracy": {
+   "no_full_registry": true,
+   "share_nodes_below_n_minus_1": 1.0,
+   "c2_80pct_below_n_minus_1": true,
+   "absent_target_lookups": 30,
+   "c3_at_least_30_absent": true,
+   "c4_each_uses_intermediate": true,
+   "absent_success_rate": 1.0,
+   "after_bootstrap_lookups": 10,
+   "c5_works_without_bootstrap": true,
+   "c6_data_saved": true,
+   "max_table_size": 12,
+   "min_table_size": 6,
+   "n": 15,
+   "non_degenerate": true
+  },
+  "logs": "node_logs.zip"
+ },
+ {
+  "scheme": "star",
+  "run": 2,
+  "seed": 2,
+  "n": 15,
+  "k": 3,
+  "full": false,
+  "join_all_s": 9.224,
+  "convergence": {
+   "converged": true,
+   "convergence_s": 9.509,
+   "rounds": 2
+  },
+  "lookups": {
+   "count": 30,
+   "success": 30
+  }
+ },
+ {
+  "scheme": "ring",
+  "run": 2,
+  "seed": 2,
+  "n": 15,
+  "k": 3,
+  "full": false,
+  "join_all_s": 9.293,
+  "convergence": {
+   "converged": true,
+   "convergence_s": 9.59,
+   "rounds": 2
+  },
+  "lookups": {
+   "count": 30,
+   "success": 30
+  }
+ },
+ {
+  "scheme": "star",
+  "run": 3,
+  "seed": 3,
+  "n": 15,
+  "k": 3,
+  "full": false,
+  "join_all_s": 9.34,
+  "convergence": {
+   "converged": true,
+   "convergence_s": 9.614,
+   "rounds": 2
+  },
+  "lookups": {
+   "count": 30,
+   "success": 30
+  }
+ },
+ {
+  "scheme": "ring",
+  "run": 3,
+  "seed": 3,
+  "n": 15,
+  "k": 3,
+  "full": false,
+  "join_all_s": 9.186,
+  "convergence": {
+   "converged": true,
+   "convergence_s": 9.493,
+   "rounds": 2
+  },
+  "lookups": {
+   "count": 30,
+   "success": 30
+  }
+ },
+ {
+  "scheme": "star",
+  "run": 4,
+  "seed": 4,
+  "n": 15,
+  "k": 3,
+  "full": false,
+  "join_all_s": 9.519,
+  "convergence": {
+   "converged": true,
+   "convergence_s": 9.806,
+   "rounds": 2
+  },
+  "lookups": {
+   "count": 30,
+   "success": 30
+  }
+ },
+ {
+  "scheme": "ring",
+  "run": 4,
+  "seed": 4,
+  "n": 15,
+  "k": 3,
+  "full": false,
+  "join_all_s": 9.798,
+  "convergence": {
+   "converged": true,
+   "convergence_s": 10.079,
+   "rounds": 2
+  },
+  "lookups": {
+   "count": 30,
+   "success": 30
+  }
+ },
+ {
+  "scheme": "star",
+  "run": 5,
+  "seed": 5,
+  "n": 15,
+  "k": 3,
+  "full": false,
+  "join_all_s": 8.989,
+  "convergence": {
+   "converged": true,
+   "convergence_s": 9.265,
+   "rounds": 2
+  },
+  "lookups": {
+   "count": 30,
+   "success": 30
+  }
+ },
+ {
+  "scheme": "ring",
+  "run": 5,
+  "seed": 5,
+  "n": 15,
+  "k": 3,
+  "full": false,
+  "join_all_s": 9.425,
+  "convergence": {
+   "converged": true,
+   "convergence_s": 9.68,
+   "rounds": 2
+  },
+  "lookups": {
+   "count": 30,
+   "success": 30
+  }
+ }
+]

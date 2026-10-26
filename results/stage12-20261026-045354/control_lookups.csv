@@ -1,0 +1,13 @@
+scenario,initiator,target,lookup_id,success,target_in_table_before,table_size_before,rpc_count,iterations,intermediate_count,timeouts,errors,duration_ms,found_by,queried_by_iteration
+control,8,14,fdc0fb069c4f,True,False,10,4,2,3,0,0,3.206,1ce0f862,"1ce0f862,0e4c27af,7412be34|1c5568d1"
+control,15,14,f50a82ed00a3,True,False,7,5,2,4,0,0,4.175,0e4c27af,"0e4c27af,003717ac,3dee6177|1c5568d1,1ce0f862"
+control,13,2,605b2e3ca394,True,False,7,5,2,4,0,0,4.291,0e4c27af,"0e4c27af,3dee6177,7412be34|1ce0f862,1c5568d1"
+control,10,8,1fe6bded765a,True,False,7,5,2,4,0,0,4.304,e0b34f37,"e0b34f37,e7de7482,ead740dc|f1e5b35e,f138df36"
+control,3,15,8210d8035988,True,False,10,5,2,4,0,0,3.729,7412be34,"7412be34,0e4c27af,1ce0f862|618d254d,3dee6177"
+control,3,14,c5776e69ea0c,True,False,10,4,2,3,0,0,3.077,1ce0f862,"1ce0f862,0e4c27af,7412be34|1c5568d1"
+control,3,5,13918e0d16bf,True,False,10,5,2,4,0,0,3.728,0e4c27af,"0e4c27af,1ce0f862,7412be34|003717ac,1c5568d1"
+control,9,11,8383072ba792,True,False,8,5,2,4,0,0,3.693,e0b34f37,"e0b34f37,e7de7482,ead740dc|f138df36,f1e5b35e"
+control,3,12,0d49722e9713,True,False,10,5,2,4,0,0,2.807,1ce0f862,"1ce0f862,0e4c27af,7412be34|3dee6177,1c5568d1"
+control,3,15,8d8ff35036a3,True,False,10,5,2,4,0,0,3.236,7412be34,"7412be34,0e4c27af,1ce0f862|618d254d,3dee6177"
+control,14,10,8a1451362083,True,False,9,6,2,5,0,0,3.591,e7de7482,"e7de7482,e0b34f37,ead740dc|9619fda2,b15fbaa2,c68c1f68"
+control,10,11,397f2e5c9c7d,True,False,7,5,2,4,0,0,2.917,e0b34f37,"e0b34f37,e7de7482,ead740dc|f138df36,f1e5b35e"

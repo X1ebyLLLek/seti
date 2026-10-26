@@ -1,0 +1,90 @@
+[
+ {
+  "node": 1,
+  "bootstrap": []
+ },
+ {
+  "node": 2,
+  "bootstrap": [
+   1
+  ]
+ },
+ {
+  "node": 3,
+  "bootstrap": [
+   1
+  ]
+ },
+ {
+  "node": 4,
+  "bootstrap": [
+   1
+  ]
+ },
+ {
+  "node": 5,
+  "bootstrap": [
+   1
+  ]
+ },
+ {
+  "node": 6,
+  "bootstrap": [
+   1
+  ]
+ },
+ {
+  "node": 7,
+  "bootstrap": [
+   1
+  ]
+ },
+ {
+  "node": 8,
+  "bootstrap": [
+   1
+  ]
+ },
+ {
+  "node": 9,
+  "bootstrap": [
+   1
+  ]
+ },
+ {
+  "node": 10,
+  "bootstrap": [
+   1
+  ]
+ },
+ {
+  "node": 11,
+  "bootstrap": [
+   1
+  ]
+ },
+ {
+  "node": 12,
+  "bootstrap": [
+   1
+  ]
+ },
+ {
+  "node": 13,
+  "bootstrap": [
+   1
+  ]
+ },
+ {
+  "node": 14,
+  "bootstrap": [
+   1
+  ]
+ },
+ {
+  "node": 15,
+  "bootstrap": [
+   1
+  ]
+ }
+]

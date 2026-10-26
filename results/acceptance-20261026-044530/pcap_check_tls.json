@@ -1,0 +1,26 @@
+{
+ "mode": "tls",
+ "pcap": "control_tls.pcap",
+ "pcap_bytes": 250052,
+ "nodes": 6,
+ "message_status": [
+  "delivered",
+  "delivered"
+ ],
+ "route": [
+  "81096d13",
+  "0960b6c5",
+  "880944da",
+  "fd7e6c87"
+ ],
+ "delivered_text_matches": true,
+ "marker_in_pcap": false,
+ "control_strings_in_pcap": {
+  "identity_public_key": false,
+  "target_node_id": false,
+  "127.0.0.1": false
+ },
+ "bytes_c2s": 92973,
+ "bytes_s2c": 111135,
+ "flows": 30
+}
