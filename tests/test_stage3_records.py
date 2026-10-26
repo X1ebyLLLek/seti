@@ -205,14 +205,22 @@ def test_record_handed_off_to_closer_node_joining_later(base, handoff):
         if not handoff:
             for n in nodes:
                 n.routing.on_added.clear()
-        owner = nodes[2]
+        # Новый узел должен оказаться ближе всех к ключу чьей-то записи: генерируем ключ нового
+        # узла и выбираем владельца, для ключа записи которого это выполняется (~60% попыток).
+        owner = None
+        for attempt in range(100):
+            state = os.path.join(str(base), f"late-{attempt}")
+            late_id = Identity.load_or_create(state).node_id
+            for n in nodes:
+                key = record_key(n.identity.node_id)
+                if xor_distance(late_id, key) < min(xor_distance(m.identity.node_id, key) for m in nodes):
+                    owner = n
+                    break
+            if owner is not None:
+                break
+        assert owner is not None, "предусловие теста: не найден ключ нового узла, ближайший к записи"
         key = record_key(owner.identity.node_id)
         res = await owner.publish_self()
-        best = min(xor_distance(n.identity.node_id, key) for n in nodes)
-        for attempt in range(200):                     # ключ нового узла ближе всех к ключу записи
-            state = os.path.join(str(base), f"late-{attempt}")
-            if xor_distance(Identity.load_or_create(state).node_id, key) < best:
-                break
         late = Node(node_config(base, 0, NODE_STATE_DIR=state))
         await late.start()
         await late.join([f"127.0.0.1:{nodes[0].cfg.LISTEN_PORT}"])

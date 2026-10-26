@@ -85,6 +85,8 @@ class Node:
         self.messaging = None        # MessagingService (overlay.app)
         self._bg: list[asyncio.Task] = []
         self._handoffs: set[asyncio.Task] = set()
+        self._handed: set[tuple] = set()           # (NodeID, ключ, sequence_number) уже переданные
+        self._stopping = False
         self.joined = False
         self.started_ms = now_ms()
         self._seq_path = os.path.join(cfg.NODE_STATE_DIR, "record_seq.json")
@@ -112,8 +114,11 @@ class Node:
         self._bg = [asyncio.ensure_future(self._maintenance_loop())]
 
     async def stop(self) -> None:
-        for t in self._bg + list(self._handoffs):
+        self._stopping = True
+        tasks = self._bg + list(self._handoffs)
+        for t in tasks:
             t.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
         if self.tunnels:
             await self.tunnels.shutdown()
         self.save_state()
@@ -283,11 +288,12 @@ class Node:
         return rec
 
     def _hand_off_records(self, contact: Contact) -> None:
-        """Передача записей новому контакту (Kademlia, §2.5 статьи Maymounkov–Mazières): если новый
-        узел входит в R ближайших к ключу хранимой записи, он получает STORE сразу, а не после
-        переопубликования. Иначе поиск, сходящийся на присоединившихся позже ближайших узлах,
-        не находил бы запись, хранящуюся на более дальних узлах."""
-        if not self.joined:
+        """Передача записей узлу, о котором узнали впервые (Kademlia, §2.5 статьи Maymounkov–Mazières:
+        «любой узел, узнавший о новом узле, передаёт ему подходящие пары»): если новый узел входит
+        в R ближайших к ключу хранимой записи, он получает STORE сразу, а не после переопубликования.
+        Иначе поиск, сходящийся на присоединившихся позже ближайших узлах, не находил бы запись,
+        хранящуюся на более дальних. Вызывается и тогда, когда bucket полон и узел в таблицу не попал."""
+        if not self.joined or self._stopping:
             return
         keys = set(self.store.keys())
         if self.own_record is not None:
@@ -297,9 +303,14 @@ class Node:
             rec = self.local_record(key)
             if rec is None or rec["node_id"] == contact.node_id:
                 continue
-            nearest = [c.node_id for c in self.table.closest(key, r)] + [self.identity.node_id]
-            nearest.sort(key=lambda nid: xor_distance(nid, key))
-            if contact.node_id in nearest[:r]:
+            mark = (contact.node_id, key, rec["sequence_number"])
+            if mark in self._handed:
+                continue                           # эту версию записи этому узлу уже передавали
+            nearest = {c.node_id for c in self.table.closest(key, r)} | {self.identity.node_id, contact.node_id}
+            if contact.node_id in sorted(nearest, key=lambda nid: xor_distance(nid, key))[:r]:
+                if len(self._handed) > 10000:
+                    self._handed.clear()
+                self._handed.add(mark)
                 task = asyncio.ensure_future(self._hand_off_one(contact, key, rec))
                 self._handoffs.add(task)
                 task.add_done_callback(self._handoffs.discard)
