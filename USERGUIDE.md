@@ -142,5 +142,7 @@ python -m overlay run --set NODE_STATE_DIR=state/b --set LISTEN_PORT=9202 --set 
 | `python scripts/analyze.py <каталог серии>` | секунды | `<каталог серии>/analysis/`: `tables.md`, `stats.csv`, `figures/*.png` |
 | `python scripts/bench_serialization.py` | секунды | сравнение JSON / MessagePack / CBOR -> `docs/serialization_benchmark.json` |
 | `python scripts/make_configs.py` | секунды | пересоздать примеры в `configs/` |
+| `python docs/report/build_report.py` | секунды | пояснительная записка `docs/report/Пояснительная_записка.docx` из сохранённых результатов |
+| `python docs/report/build_slides.py` | секунды | презентация `docs/report/Презентация.pptx` (текст доклада — в заметках к слайдам) |
 
 Все сценарии создают новый каталог результатов и не меняют исходный код и конфигурации.

@@ -79,7 +79,7 @@ python scripts/analyze.py results/experiments-<время>   # таблицы и
 | [ARCHITECTURE.md](ARCHITECTURE.md) | подсистемы, потоки данных, инженерные решения |
 | [PROTOCOL.md](PROTOCOL.md) | формат кадра, типы сообщений, схемы payload, lookup, записи, TLS, туннели |
 | [docs/stage12_report.md](docs/stage12_report.md) | краткий отчёт этапов 1–2 |
-| [docs/report/](docs/report/) | пояснительная записка и презентация |
+| [docs/report/](docs/report/) | пояснительная записка (.docx) и презентация (.pptx) с генераторами |
 | [results/](results/) | сырые данные приёмки, демонстрации и экспериментов |
 
 ## Структура
