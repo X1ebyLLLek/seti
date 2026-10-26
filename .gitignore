@@ -9,3 +9,4 @@ control.json
 # исходные файлы задания с пробелами в именах (копии лежат в docs/assignment/)
 /Etapy_1-2_*.md
 /TZ_*.md
+.venv/
